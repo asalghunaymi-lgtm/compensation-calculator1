@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حاسبة تكلفة التدهور البيئي — مخالفات إلقاء مياه الصرف غير المعالجة</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#14231C; --muted:#5D6E64; --line:#DCE4DE;
+  --forest:#0B3D2E; --leaf:#1D6A4F; --leaf-soft:#E7F1EC;
+  --sand:#B98A22; --sand-soft:#FBF4E4;
+  --bg:#F5F7F5; --card:#FFFFFF; --danger:#9C3B2E; --danger-soft:#F9ECE9;
+  --accent:#2E7D5B;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink);line-height:1.75}
+.wrap{max-width:1000px;margin:0 auto;padding:24px 16px 80px}
+
+header.top{background:var(--forest);color:#fff;border-radius:14px;padding:28px 28px 24px;margin-bottom:22px}
+header.top img.logo{height:64px;display:block;margin-bottom:14px;background:#fff;border-radius:8px;padding:6px}
+header.top .org{font-size:.8rem;color:#BFD6CB;margin-bottom:6px}
+header.top h1{font-size:1.4rem;font-weight:700}
+header.top .sub{font-size:.86rem;color:#D8E6DF;margin-top:8px;max-width:720px}
+.formula{margin-top:14px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:10px;padding:10px 16px;font-size:1rem;font-weight:600;display:inline-block}
+.formula b{color:#F2D48A}
+
+section.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px;margin-bottom:20px}
+h2.sec{font-size:1.05rem;font-weight:700;color:var(--forest);margin-bottom:4px}
+p.hint{font-size:.82rem;color:var(--muted);margin-bottom:16px}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:760px){.grid2,.grid4{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.grid2,.grid4{grid-template-columns:1fr}}
+label.f{display:block;font-size:.84rem;font-weight:600;margin-bottom:4px}
+label.f small{font-weight:400;color:var(--muted)}
+input[type=text],input[type=number],input[type=date],select,textarea{
+  width:100%;border:1px solid var(--line);border-radius:8px;padding:9px 12px;
+  font:inherit;font-size:.9rem;background:#FCFDFC;color:var(--ink)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--leaf);outline-offset:0;border-color:var(--leaf)}
+textarea{resize:vertical;min-height:64px}
+input[type=number]{text-align:left;direction:ltr}
+
+.viol{border:1px solid var(--line);border-radius:12px;padding:18px;margin-top:16px;background:#FBFCFB}
+.viol-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.viol-head h3{font-size:.98rem;font-weight:700;color:var(--forest)}
+.btn{font:inherit;font-weight:600;border:none;border-radius:8px;padding:9px 18px;cursor:pointer;font-size:.88rem}
+.btn-add{background:var(--leaf);color:#fff}
+.btn-add:hover{background:var(--forest)}
+.btn-del{background:var(--danger-soft);color:var(--danger);padding:6px 14px}
+.btn-print{background:var(--forest);color:#fff}
+
+.block{border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:14px;background:#fff}
+.block>.b-head{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:10px}
+.block h4{font-size:.92rem;font-weight:700;color:var(--accent)}
+.block h4 span.tag{font-size:.7rem;font-weight:600;background:var(--leaf-soft);color:var(--forest);border-radius:6px;padding:2px 8px;margin-inline-start:6px}
+.b-sub{font-size:.78rem;color:var(--muted);margin-bottom:10px}
+.chk{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--muted);white-space:nowrap}
+.chk input{width:15px;height:15px;accent-color:var(--leaf)}
+
+.mini-total{margin-top:10px;font-size:.85rem;font-weight:700;color:var(--forest);background:var(--leaf-soft);border-radius:8px;padding:8px 12px;display:flex;justify-content:space-between}
+.mini-total .v{direction:ltr}
+
+.eq-note{font-size:.76rem;color:var(--muted);background:var(--sand-soft);border-radius:8px;padding:8px 12px;margin-top:10px}
+
+.subtotal{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding:14px 16px;background:var(--forest);color:#fff;border-radius:10px;font-weight:700}
+.subtotal .val{font-size:1.15rem;direction:ltr;color:#F2D48A}
+
+.total-card{background:var(--forest);color:#fff;border-radius:14px;padding:24px 28px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.total-card .t-label{font-size:1rem;font-weight:600;color:#BFD6CB}
+.total-card .t-val{font-size:2rem;font-weight:700;direction:ltr}
+.total-card .t-val small{font-size:1rem;font-weight:500;color:#F2D48A}
+.live-formula{width:100%;margin-top:10px;font-size:.88rem;color:#D8E6DF;border-top:1px solid rgba(255,255,255,.15);padding-top:10px}
+
+.actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+footer.note{font-size:.75rem;color:var(--muted);margin-top:26px;text-align:center;line-height:1.9}
+
+@media print{
+  body{background:#fff}
+  .btn,.actions{display:none!important}
+  section.card,.viol,.block{border-color:#bbb;break-inside:avoid}
+  header.top,.subtotal,.total-card{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <img class="logo" src="ncec-logo.jpg" alt="شعار المركز الوطني للرقابة على الالتزام البيئي" onerror="this.style.display='none'">
+  <div class="org">المركز الوطني للرقابة على الالتزام البيئي — الإدارة القانونية | فرع المنطقة الشمالية</div>
+  <h1>حاسبة تكلفة التدهور البيئي</h1>
+  <div class="sub">مخالفات إلقاء مياه الصرف والسوائل غير المعالجة في الأوساط البيئية — المحالة إلى النيابة العامة، وفقًا للمادة (٣٥/١) والمادة (٤٣) من نظام البيئة والمادة (الخامسة) من لائحته التنفيذية — مبدأ "الملوّث يدفع"</div>
+  <div class="formula">تكلفة التدهور البيئي = ( <b>الخسائر المباشرة</b> + <b>الخسائر غير المباشرة</b> ) × <b>معامل عدم اليقين</b></div>
+  <div class="sub" style="margin-top:8px;font-size:.76rem">المنهجية المعتمدة: مخرجات مشروع الدراسة الاستشارية لتحديد حساب تكلفة التدهور البيئي على البحر الأحمر والخليج العربي — الإدارة التنفيذية لعمليات الرصد</div>
+</header>
+
+<section class="card">
+  <h2 class="sec">١. بيانات الواقعة</h2>
+  <p class="hint">تُستخدم هذه البيانات في ترويسة التقرير المطبوع.</p>
+  <div class="grid2">
+    <div><label class="f">رقم القضية / الملف</label><input type="text" id="caseNo" placeholder="مثال: ١٤٤٧/..."></div>
+    <div><label class="f">اسم / صفة المخالف</label><input type="text" id="violator" placeholder="اسم المنشأة أو الشخص"></div>
+    <div><label class="f">تاريخ وقوع المخالفة</label><input type="date" id="caseDate"></div>
+    <div><label class="f">الموقع الجغرافي</label><input type="text" id="siteLoc" placeholder="المدينة / الإحداثيات"></div>
+    <div><label class="f">نوع المخالفة</label>
+      <select id="vType">
+        <option>إلقاء مياه صرف صحي غير معالجة</option>
+        <option>إلقاء سوائل صناعية غير معالجة</option>
+        <option>تصريف مياه مختلطة (صحية وصناعية)</option>
+        <option>مخالفة تصريف أخرى</option>
+      </select>
+    </div>
+    <div><label class="f">الجهة المحال إليها</label><input type="text" id="refBody" value="النيابة العامة"></div>
+    <div><label class="f">رقم البلاغ / الضبط</label><input type="text" id="reportNo" placeholder="رقم محضر الضبط"></div>
+    <div><label class="f">مُعِد التقرير</label><input type="text" id="preparer" placeholder="الاسم والصفة الوظيفية"></div>
+  </div>
+</section>
+
+<section class="card">
+  <h2 class="sec">٢. احتساب تكلفة التدهور البيئي</h2>
+  <p class="hint">يُحتسب لكل مخالفة على حدة ثم يُجمع الإجمالي. جميع المبالغ بالريال السعودي.</p>
+  <div id="violations"></div>
+  <div class="actions">
+    <button class="btn btn-add" onclick="addViolation()">+ إضافة مخالفة</button>
+  </div>
+</section>
+
+<section class="total-card">
+  <div>
+    <div class="t-label">إجمالي تكلفة التدهور البيئي المستحقة</div>
+    <div class="t-val" id="grandTotal">0 <small>ريال</small></div>
+  </div>
+  <div style="text-align:left"><button class="btn btn-print" onclick="window.print()">طباعة / حفظ PDF</button></div>
+  <div class="live-formula" id="liveFormula"></div>
+</section>
+
+<footer class="note">
+  المنهجية مستندة إلى مخرجات مشروع الدراسة الاستشارية لتحديد حساب تكلفة التدهور البيئي على البحر الأحمر والخليج العربي (المخرج ٠٣: آلية الحساب، والمخرج ٠٥: البرنامج الحاسوبي)<br>
+  المخرجات استرشادية وتخضع للمراجعة الفنية والقانونية قبل الاعتماد الرسمي
+</footer>
+</div>
+
+<script>
+let vCount = 0;
+const fmt = n => new Intl.NumberFormat('ar-SA',{maximumFractionDigits:2}).format(n||0);
+const num = el => parseFloat(el.value)||0;
+
+function addViolation(){
+  vCount++;
+  const d = document.createElement('div');
+  d.className = 'viol';
+  d.innerHTML = `
+  <div class="viol-head">
+    <h3>مخالفة #${vCount}</h3>
+    <button class="btn btn-del" onclick="this.closest('.viol').remove();renumber();calc()">حذف</button>
+  </div>
+  <label class="f">وصف المخالفة</label>
+  <textarea placeholder="وصف موجز لواقعة إلقاء مياه الصرف / السوائل غير المعالجة"></textarea>
+
+  <!-- الخسائر المباشرة -->
+  <div class="block">
+    <div class="b-head">
+      <h4>الخسائر المباشرة <span class="tag">خ‌م</span></h4>
+      <label class="chk"><input type="checkbox"> موثّق بشواهد</label>
+    </div>
+    <div class="b-sub">عبء انتشار التلوث × معامل السمية × معامل فترة التراكم الحيوي × معامل الحساسية × المكافئ المالي</div>
+    <div class="grid4">
+      <div><label class="f">عبء انتشار التلوث <small>(الكمية)</small></label><input type="number" min="0" step="any" placeholder="0" data-f="load" oninput="calc()"></div>
+      <div><label class="f">وحدة القياس</label>
+        <select data-f="unit"><option value="كغ">كغ</option><option value="م³">م³</option></select>
+      </div>
+      <div><label class="f">معامل السمية</label><input type="number" min="0" step="any" placeholder="1" data-f="tox" oninput="calc()"></div>
+      <div><label class="f">معامل فترة التراكم الحيوي</label><input type="number" min="0" step="any" placeholder="1" data-f="bio" oninput="calc()"></div>
+      <div><label class="f">معامل الحساسية <small>(حساسية الوسط البيئي)</small></label><input type="number" min="0" step="any" placeholder="1" data-f="sens" oninput="calc()"></div>
+      <div><label class="f">المكافئ المالي <small>(ريال لكل وحدة)</small></label><input type="number" min="0" step="any" placeholder="0" data-f="equiv" oninput="calc()"></div>
+      <div style="grid-column:span 2"><label class="f">مصدر البيانات / الشاهد</label><input type="text" placeholder="تقرير الضبط، نتائج المختبر، محضر المعاينة..."></div>
+    </div>
+    <div class="mini-total"><span>مجموع الخسائر المباشرة</span><span class="v" data-direct>0 ريال</span></div>
+  </div>
+
+  <!-- الخسائر غير المباشرة -->
+  <div class="block">
+    <div class="b-head">
+      <h4>الخسائر غير المباشرة <span class="tag">خ‌غ</span></h4>
+      <label class="chk"><input type="checkbox"> موثّق بشواهد</label>
+    </div>
+    <div class="b-sub">تكلفة الوقت + تكاليف الآثار الاقتصادية والاستثمارات الأجنبية + تكاليف الآثار الاجتماعية</div>
+
+    <label class="f" style="color:var(--accent);margin-top:6px">أ) تكلفة الوقت</label>
+    <div class="grid4">
+      <div><label class="f">عدد الموظفين</label><input type="number" min="0" step="any" placeholder="0" data-f="emp" oninput="calc()"></div>
+      <div><label class="f">عدد ساعات العمل</label><input type="number" min="0" step="any" placeholder="0" data-f="hrs" oninput="calc()"></div>
+      <div><label class="f">تكلفة الساعة الواحدة <small>(ريال)</small></label><input type="number" min="0" step="any" placeholder="0" data-f="rate" oninput="calc()"></div>
+      <div><label class="f">مصدر البيانات</label><input type="text" placeholder="كشوف التكاليف..."></div>
+    </div>
+
+    <label class="f" style="color:var(--accent);margin-top:12px">ب) تكاليف الآثار الاقتصادية والاستثمارات الأجنبية</label>
+    <div class="grid4">
+      <div><label class="f">كمية الإنتاج المفقود</label><input type="number" min="0" step="any" placeholder="0" data-f="lostQ" oninput="calc()"></div>
+      <div><label class="f">سعر السوق <small>(ريال للوحدة)</small></label><input type="number" min="0" step="any" placeholder="0" data-f="mkt" oninput="calc()"></div>
+      <div><label class="f">تكلفة المورد البديل <small>(ريال للوحدة)</small></label><input type="number" min="0" step="any" placeholder="0" data-f="subC" oninput="calc()"></div>
+      <div><label class="f">الكمية المطلوبة من البديل</label><input type="number" min="0" step="any" placeholder="0" data-f="subQ" oninput="calc()"></div>
+    </div>
+
+    <label class="f" style="color:var(--accent);margin-top:12px">ج) تكاليف الآثار الاجتماعية</label>
+    <div class="grid4">
+      <div><label class="f">عدد الأسر المتضررة</label><input type="number" min="0" step="any" placeholder="0" data-f="fam" oninput="calc()"></div>
+      <div><label class="f">تكلفة الضرر الاجتماعي <small>(ريال للأسرة)</small></label><input type="number" min="0" step="any" placeholder="0" data-f="soc" oninput="calc()"></div>
+      <div><label class="f">معامل التوزيع</label><input type="number" min="0" step="any" placeholder="1" data-f="dist" oninput="calc()"></div>
+      <div><label class="f">مصدر البيانات</label><input type="text" placeholder="مسوحات، تقارير الجهات..."></div>
+    </div>
+    <div class="mini-total"><span>مجموع الخسائر غير المباشرة</span><span class="v" data-indirect>0 ريال</span></div>
+  </div>
+
+  <!-- عدم اليقين -->
+  <div class="block">
+    <div class="b-head"><h4>معامل عدم اليقين <span class="tag">×</span></h4></div>
+    <div class="b-sub">يُطبَّق وفق توصيات الهيئات البيئية والصحية الدولية عند ضعف البيانات أو استخدام فرضيات أو متوسطات أو التقييم الأولي السريع</div>
+    <div class="grid4">
+      <div>
+        <label class="f">مستوى اليقين</label>
+        <select data-f="uSel" onchange="uPreset(this)">
+          <option value="1">بيانات كاملة وموثقة (1.00)</option>
+          <option value="1.1">فرضيات أو متوسطات جزئية (1.10)</option>
+          <option value="1.2">ضعف في البيانات (1.20)</option>
+          <option value="1.3">تقييم أولي سريع (1.30)</option>
+          <option value="custom">قيمة مخصصة</option>
+        </select>
+      </div>
+      <div><label class="f">قيمة المعامل</label><input type="number" min="1" step="0.01" value="1" data-f="uVal" oninput="calc()"></div>
+      <div style="grid-column:span 2"><label class="f">مبرر اختيار المعامل</label><input type="text" placeholder="سبب تطبيق هذا المستوى من عدم اليقين"></div>
+    </div>
+  </div>
+
+  <div class="eq-note" data-eq>تكلفة هذه المخالفة = (0 + 0) × 1.00</div>
+  <div class="subtotal"><span>تكلفة التدهور البيئي لهذه المخالفة</span><span class="val" data-sub>0 ريال</span></div>`;
+  document.getElementById('violations').appendChild(d);
+  calc();
+}
+
+function uPreset(sel){
+  const v = sel.closest('.viol').querySelector('[data-f="uVal"]');
+  if(sel.value !== 'custom'){ v.value = sel.value; }
+  calc();
+}
+
+function renumber(){
+  document.querySelectorAll('.viol').forEach((v,i)=>{
+    v.querySelector('h3').textContent = `مخالفة #${i+1}`;
+  });
+}
+
+function calc(){
+  let grand=0, sumD=0, sumI=0;
+  document.querySelectorAll('.viol').forEach(v=>{
+    const g = f => num(v.querySelector(`[data-f="${f}"]`));
+    const orOne = x => x>0 ? x : 1;
+
+    // الخسائر المباشرة
+    const direct = g('load') * orOne(g('tox')) * orOne(g('bio')) * orOne(g('sens')) * g('equiv');
+
+    // الخسائر غير المباشرة
+    const time = g('emp') * g('hrs') * g('rate');
+    const econ = (g('lostQ') * g('mkt')) + (g('subC') * g('subQ'));
+    const social = g('fam') * g('soc') * orOne(g('dist'));
+    const indirect = time + econ + social;
+
+    const u = Math.max(1, g('uVal')||1);
+    const t = (direct + indirect) * u;
+
+    v.querySelector('[data-direct]').textContent = fmt(direct)+' ريال';
+    v.querySelector('[data-indirect]').textContent = fmt(indirect)+' ريال';
+    v.querySelector('[data-eq]').textContent =
+      `تكلفة هذه المخالفة = (${fmt(direct)} + ${fmt(indirect)}) × ${u.toFixed(2)} = ${fmt(t)} ريال`;
+    v.querySelector('[data-sub]').textContent = fmt(t)+' ريال';
+
+    grand+=t; sumD+=direct; sumI+=indirect;
+  });
+  document.getElementById('grandTotal').innerHTML = fmt(grand)+' <small>ريال</small>';
+  document.getElementById('liveFormula').textContent =
+    `الإجمالي = مجموع الخسائر المباشرة (${fmt(sumD)}) + مجموع الخسائر غير المباشرة (${fmt(sumI)}) بعد تطبيق معاملات عدم اليقين = ${fmt(grand)} ريال`;
+}
+
+addViolation();
+</script>
+</body>
+</html>
